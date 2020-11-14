@@ -32,10 +32,14 @@ if __name__ == '__main__':
     # Select the strategy from strategies.py
     cerebro.addstrategy(TestStrategy)
 
+    # Set default position size
+    cerebro.addsizer(bt.sizers.FixedSize, stake=1000)
+
     print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
     cerebro.run()  
 
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
-    
+
+    cerebro.plot()
     
