@@ -3,6 +3,7 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 import datetime  # For datetime objects
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
+from strategies import TestStrategy
 
 import backtrader as bt
 
@@ -23,6 +24,8 @@ if __name__ == '__main__':
     cerebro.adddata(data)
 
     cerebro.broker.setcash(100000.0)
+
+    cerebro.addstrategy(TestStrategy)
 
     print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
