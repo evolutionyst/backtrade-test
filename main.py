@@ -23,8 +23,13 @@ if __name__ == '__main__':
     # Add the Data Feed to Cerebro
     cerebro.adddata(data)
 
+    # Set the starting cash
     cerebro.broker.setcash(100000.0)
 
+    # Set the commission - 0.1% ... divide by 100 to remove the %
+    cerebro.broker.setcommission(commission=0.001)
+
+    # Select the strategy from strategies.py
     cerebro.addstrategy(TestStrategy)
 
     print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
