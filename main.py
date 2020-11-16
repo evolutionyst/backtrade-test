@@ -3,9 +3,10 @@ from __future__ import (absolute_import, division, print_function, unicode_liter
 import datetime  # For datetime objects
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
+import backtrader as bt
 from strategies import TestStrategy
 
-import backtrader as bt
+
 
 if __name__ == '__main__':
     # Create a cerebro entity
@@ -15,9 +16,9 @@ if __name__ == '__main__':
     data = bt.feeds.YahooFinanceCSVData(
         dataname='oracle.csv',
         # Do not pass values before this date
-        fromdate= datetime.datetime(2000, 1, 1),
+        fromdate= datetime.datetime(1999, 1, 1),
         # Do not pass values after this date
-        todate= datetime.datetime(2000, 12, 31),
+        todate= datetime.datetime(2001, 12, 31),
         reverse=False)
     
     # Add the Data Feed to Cerebro
@@ -42,4 +43,3 @@ if __name__ == '__main__':
     print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
 
     cerebro.plot()
-    

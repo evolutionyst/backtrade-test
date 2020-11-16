@@ -18,6 +18,10 @@ class TestStrategy(bt.Strategy):
         self.buyprice = None
         self.buycomm = None
 
+        # Add a quick and slow MovingAverageSimple indicator
+        self.sma = bt.indicators.MovingAverageSimple()
+        
+
     def notify_order(self, order):
         if order.status in [order.Submitted, order.Accepted]:
             # Buy/Sell order submitted/accepted to/by broker - Nothing to do
@@ -82,7 +86,7 @@ class TestStrategy(bt.Strategy):
         else:
 
             # Already in the market ... we might sell
-            if len(self) >= (self.bar_executed + 5):
+            if len(self) >= (self.bar_executed + 10):
                 # SELL, SELL, SELL!!! (with all possible default parameters)
                 self.log('SELL CREATE, %.2f' % self.dataclose[0])
 
