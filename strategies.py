@@ -2,7 +2,7 @@ import backtrader as bt
 import datetime
 
 # Create a Strategy
-class TestStrategy(bt.Strategy):
+class buycross(bt.Strategy):
 
     def log(self, txt, dt=None):
         #''' Logging function fot this strategy'''
@@ -17,9 +17,12 @@ class TestStrategy(bt.Strategy):
         self.order = None
         self.buyprice = None
         self.buycomm = None
+        self.mklong = None
+        self.mkshort = None
+
 
         # Add a quick and slow MovingAverageSimple indicator
-        self.sma = bt.indicators.MovingAverageSimple()
+        self.sma = bt.indicators.MovingAverageSimple(self.datas[0], period=30)
         
 
     def notify_order(self, order):
@@ -67,28 +70,62 @@ class TestStrategy(bt.Strategy):
         if self.order:
             return
 
+        nowMA = self.sma[0]
+        nowClose = self.dataclose[0]
+        previousMA= self.sma[-1]
+        previousClose = self.dataclose[-1]
+    
+        # Define crossovers for the point in time strategy
+        upward_crossover = previousClose < previousMA and nowClose > nowMA
+        downward_crossover = previousClose > previousMA and nowClose < nowMA
+
         # Check if we are in the market
         if not self.position:
+            # Confirm we're NOT in the market
+            
+            if upward_crossover:
 
-            # Not yet ... we MIGHT BUY if ...
-            if self.dataclose[0] < self.dataclose[-1]:
-                    # current close less than previous close
+                # BUY, BUY, BUY!!! (with default parameters)
+                self.log('OPEN LONG, %.2f' % self.dataclose[0])
 
-                    if self.dataclose[-1] < self.dataclose[-2]:
-                        # previous close less than the previous close
+                # Keep track of the created order to avoid a 2nd order
+                self.order = self.buy()
 
-                        # BUY, BUY, BUY!!! (with default parameters)
-                        self.log('BUY CREATE, %.2f' % self.dataclose[0])
+                # Keep track of the fact that we're long in the market
+                self.mklong = True
+            
+            if downward_crossover:
 
-                        # Keep track of the created order to avoid a 2nd order
-                        self.order = self.buy()
-
-        else:
-
-            # Already in the market ... we might sell
-            if len(self) >= (self.bar_executed + 10):
-                # SELL, SELL, SELL!!! (with all possible default parameters)
-                self.log('SELL CREATE, %.2f' % self.dataclose[0])
+                # SELL SHORT
+                self.log('OPEN SHORT, %.2f' % self.dataclose[0])
 
                 # Keep track of the created order to avoid a 2nd order
                 self.order = self.sell()
+
+                # Keep track of the fact that we're short in the market
+                self.mkshort = True
+
+
+        else:
+            # Confirm we ARE in the market
+
+            if downward_crossover and self.mklong == True:
+
+                # SELL, SELL, SELL!!! (with all possible default parameters)
+                self.log('CLOSE LONG, %.2f' % self.dataclose[0])
+
+                # Keep track of the created order to avoid a 2nd order
+                self.order = self.sell()
+
+                mklong = False
+
+            
+            if upward_crossover and self.mkshort == True:
+
+                # BUY, BUY, BUY!!! (with default parameters)
+                self.log('CLOSE SHORT, %.2f' % self.dataclose[0])
+
+                # Keep track of the created order to avoid a 2nd order
+                self.order = self.buy()
+
+                self.mkshort = False

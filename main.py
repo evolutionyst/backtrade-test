@@ -4,7 +4,8 @@ import datetime  # For datetime objects
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
 import backtrader as bt
-from strategies import TestStrategy
+from strategies import buycross
+#from bbadx import BBADX
 
 
 
@@ -14,11 +15,11 @@ if __name__ == '__main__':
     
     # Create a Data Feed
     data = bt.feeds.YahooFinanceCSVData(
-        dataname='oracle.csv',
+        dataname='qqq.csv',
         # Do not pass values before this date
-        fromdate= datetime.datetime(1999, 1, 1),
+        fromdate= datetime.datetime(2019, 10, 4),
         # Do not pass values after this date
-        todate= datetime.datetime(2001, 12, 31),
+        todate= datetime.datetime(2020, 10, 4),
         reverse=False)
     
     # Add the Data Feed to Cerebro
@@ -31,7 +32,7 @@ if __name__ == '__main__':
     cerebro.broker.setcommission(commission=0.001)
 
     # Select the strategy from strategies.py
-    cerebro.addstrategy(TestStrategy)
+    cerebro.addstrategy(buycross)
 
     # Set default position size
     cerebro.addsizer(bt.sizers.FixedSize, stake=1000)
