@@ -4,10 +4,7 @@ import datetime  # For datetime objects
 import os.path  # To manage paths
 import sys  # To find out the script name (in argv[0])
 import backtrader as bt
-from strategiescopy import TestStrat
-#from bbadx import BBADX
-
-
+from VolumeCrossover2Ways import VolumeCrossover2Ways
 
 if __name__ == '__main__':
     # Create a cerebro entity
@@ -15,11 +12,11 @@ if __name__ == '__main__':
     
     # Create a Data Feed
     data = bt.feeds.YahooFinanceCSVData(
-        dataname='qqq.csv',
+        dataname='mtum.csv',
         # Do not pass values before this date
-        fromdate= datetime.datetime(2016, 1, 1),
+        fromdate= datetime.datetime(2015, 12, 1),
         # Do not pass values after this date
-        todate= datetime.datetime(2020, 11, 1),
+        todate= datetime.datetime(2017, 11, 1),
         reverse=False)
     
     # Add the Data Feed to Cerebro
@@ -32,10 +29,10 @@ if __name__ == '__main__':
     cerebro.broker.setcommission(commission=0.003)
 
     # Select the strategy from strategies.py
-    cerebro.addstrategy(TestStrat)
+    cerebro.addstrategy(VolumeCrossover2Ways)
 
     # Set default position size
-    cerebro.addsizer(bt.sizers.PercentSizer, percents=50)
+    cerebro.addsizer(bt.sizers.PercentSizer, percents=60)
 
     print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
 

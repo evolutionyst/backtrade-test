@@ -4,14 +4,15 @@ import datetime
 
 
 #create a class
-class TestStrat(bt.Strategy):
+class SimpleCrossover2Ways(bt.Strategy):
 
 
+    #define log function for later use. prints needed values for terminal.
     def log(self, txt, dt=None):
-        #''' Logging function fot this strategy'''
         dt = dt or self.datas[0].datetime.date(0)
         print('%s, %s' % (dt.isoformat(), txt))
 
+    #initialize strategy
     def __init__(self):
 
         #keep a log of where we are in the datafeed
@@ -20,11 +21,13 @@ class TestStrat(bt.Strategy):
         #create fast and slow moving averages
         self.ma_fast = btind.SMA(period = 5)
         self.ma_slow = btind.SMA(period = 30)
-        # set values for when the fast ma crosses the slow w backtrader's indicator
+        # set values for when the fast ma crosses the slow ma w backtrader's indicator
+        # -1 is bearish, 1 is bullish
         self.crossover = btind.CrossOver(self.ma_fast, self.ma_slow)
 
+    #notify of pending or completed orders
     def notify_order(self, order):
-        # check the status       
+        # check the status and return info based on it      
         if order.status in [order.Completed]:
             if order.isbuy():
                 self.log('BUY, %.2f' % self.dataclose[0])
@@ -35,6 +38,7 @@ class TestStrat(bt.Strategy):
             self.log('Order Canceled/Margin/Rejected')
 
     def notify_trade(self, trade):
+        # check the status and return info based on it   
         if not trade.isclosed:
             return
 
@@ -42,6 +46,7 @@ class TestStrat(bt.Strategy):
 
     def next(self):
 
+        #if not in the market (long or short) then set an initial position
         if not self.position:
             if self.ma_fast > self.ma_slow:
                 self.buy()
@@ -49,6 +54,7 @@ class TestStrat(bt.Strategy):
             elif self.ma_fast < self.ma_slow:
                 self.sell()
         
+        #if already in the market and see a crossover then liquidate existing position and reverse
         if self.position:         
             if self.crossover > 0:
                 self.close()
